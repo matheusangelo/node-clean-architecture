@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        //qual pasta o js será armazenado no servidor
+        "outDir": "./dist",
+        //para qual versão do js será configurado no servidor
+        "module":"commonjs",
+        //versão do ES que será utilizado no projeto
+        "target":"ES2019",
+        //campo obrigatório
+        "esModuleInterop": true,
+        //permite criação de arquivo no formato js
+        "allowJs": true
+    }
+}
