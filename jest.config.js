@@ -2,6 +2,9 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+    roots: [
+        '<rootDir>/src'
+    ],
     clearMocks: true,
     collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
     coverageDirectory: "coverage",

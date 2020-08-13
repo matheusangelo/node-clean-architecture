@@ -5,8 +5,7 @@
     "main": "index.js",
     "scripts": {
         "test": "jest",
-        "init test": "jest --init"
-
+        "test:staged": "jest"
     },
     "keywords": [],
     "author": "",
