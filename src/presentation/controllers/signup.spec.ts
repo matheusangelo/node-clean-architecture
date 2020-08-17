@@ -115,4 +115,38 @@ describe('SignUpController', () => {
     expect(validate.body).toEqual(new InternalServerError())
     expect(validate.statusCode).toBe(500)
   })
+  test('Should return 500 if not send a valid request email with spy', () => {
+    const { sut, emailValidatorStub } = makeSut()
+
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const httpRequest = {
+      body: {
+        email: 'teste@gmail.com',
+        name: 'teste',
+        password: 'teste',
+        passwordConfirmation: 'teste'
+      }
+    }
+    const validate = sut.handle(httpRequest)
+    expect(validate.body).toEqual(new InternalServerError())
+    expect(validate.statusCode).toBe(500)
+  })
+  test('Should return 400 if password and confirmPassword are not equal', () => {
+    const { sut } = makeSut()
+
+    const httpRequest = {
+      body: {
+        email: 'teste@gmail.com',
+        name: 'teste',
+        password: 'teste',
+        passwordConfirmation: 'teste1'
+      }
+    }
+    const validate = sut.handle(httpRequest)
+    expect(validate.body).toEqual(new InvalidParamError('passwordConfirmation'))
+    expect(validate.statusCode).toBe(400)
+  })
 })
