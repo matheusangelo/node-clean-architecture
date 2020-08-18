@@ -1,7 +1,15 @@
-import { MissingParamError, InvalidParamError } from '../errors'
-import { badRequest, serverError } from '../helpers/http-helper'
-import { Controller, EmailValidator, HttpRequest, HttpResponse } from '../protocols'
-import { AddAccount } from '../../domain/usescases/add-account'
+import {
+  AddAccount,
+  Controller,
+  EmailValidator,
+  HttpRequest,
+  HttpResponse,
+  badRequest,
+  serverError,
+  ok,
+  MissingParamError,
+  InvalidParamError
+} from '../signup/sigunp.index'
 
 export class SignUpController implements Controller {
   private readonly _emailValidation: EmailValidator
@@ -39,11 +47,13 @@ export class SignUpController implements Controller {
         return badRequest(new InvalidParamError('email'))
       }
 
-      await this._addAccount.add({
+      const account = await this._addAccount.add({
         name,
         email,
         password
       })
+
+      return ok(account)
     } catch (error) {
       return serverError()
     }

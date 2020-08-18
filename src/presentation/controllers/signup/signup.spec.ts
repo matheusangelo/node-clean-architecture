@@ -1,10 +1,10 @@
 import { SignUpController } from './signup'
-import { MissingParamError } from '../errors/missing-param-errors'
-import { EmailValidator } from '../protocols/email-validator'
-import { InvalidParamError } from '../errors/invalid-param-errros'
-import { InternalServerError } from '../errors/internal-server-error'
-import { AddAccountModel, AddAccount } from '../../domain/usescases/add-account'
-import { AccountModel } from '../../domain/models/account'
+import { MissingParamError } from '../../errors/missing-param-errors'
+import { EmailValidator } from '../../protocols/email-validator'
+import { InvalidParamError } from '../../errors/invalid-param-errros'
+import { InternalServerError } from '../../errors/internal-server-error'
+import { AddAccountModel, AddAccount } from '../../../domain/usescases/add-account'
+import { AccountModel } from '../../../domain/models/account'
 
 class EmailValidatorInternalServerErrorStub implements EmailValidator {
   isValid (email: string): boolean {
@@ -13,8 +13,8 @@ class EmailValidatorInternalServerErrorStub implements EmailValidator {
 }
 
 class AddAccountStub implements AddAccount {
-  add (account: AddAccountModel): AccountModel {
-    return {
+  async add (account: AddAccountModel): Promise<AccountModel> {
+    return await {
       id: 'valid_Id',
       name: 'valid_name',
       email: 'valid@mail.com',
@@ -187,5 +187,26 @@ describe('SignUpController', () => {
       name: httpRequest.body.name,
       password: httpRequest.body.password
     })
+  })
+  test('Should return 200 when send a valid request', async () => {
+    const { sut } = makeSut()
+
+    const httpRequest = {
+      body: {
+        email: 'valid@mail.com',
+        name: 'valid_name',
+        password: 'teste',
+        passwordConfirmation: 'teste'
+      }
+    }
+
+    const validate = await sut.handle(httpRequest)
+    expect(validate.body).toEqual({
+      id: 'valid_Id',
+      name: 'valid_name',
+      email: 'valid@mail.com',
+      password: 'teste'
+    })
+    expect(validate.statusCode).toBe(200)
   })
 })
