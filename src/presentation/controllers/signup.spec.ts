@@ -3,16 +3,30 @@ import { MissingParamError } from '../errors/missing-param-errors'
 import { EmailValidator } from '../protocols/email-validator'
 import { InvalidParamError } from '../errors/invalid-param-errros'
 import { InternalServerError } from '../errors/internal-server-error'
-
-interface SutTypes{
-  sut: SignUpController
-  emailValidatorStub: EmailValidator
-}
+import { AddAccountModel, AddAccount } from '../../domain/usescases/add-account'
+import { AccountModel } from '../../domain/models/account'
 
 class EmailValidatorInternalServerErrorStub implements EmailValidator {
   isValid (email: string): boolean {
     throw new InternalServerError()
   }
+}
+
+class AddAccountStub implements AddAccount {
+  add (account: AddAccountModel): AccountModel {
+    return {
+      id: 'valid_Id',
+      name: 'valid_name',
+      email: 'valid@mail.com',
+      password: 'teste'
+    }
+  }
+}
+
+interface SutTypes {
+  sut: SignUpController
+  emailValidatorStub: EmailValidator
+  addAccountStub: AddAccountStub
 }
 
 const makeSut = (): SutTypes => {
@@ -22,10 +36,13 @@ const makeSut = (): SutTypes => {
     }
   }
   const emailValidatorStub = new EmailValidatorStub()
-  const sut = new SignUpController(emailValidatorStub)
+  const addAccountStub = new AddAccountStub()
+
+  const sut = new SignUpController(emailValidatorStub, addAccountStub)
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    addAccountStub
   }
 }
 
@@ -101,7 +118,9 @@ describe('SignUpController', () => {
   })
   test('Should return 500 if not send a valid request email', () => {
     const emailValidatorStubWithError = new EmailValidatorInternalServerErrorStub()
-    const sut = new SignUpController(emailValidatorStubWithError)
+    const addAccountStub = new AddAccountStub()
+
+    const sut = new SignUpController(emailValidatorStubWithError, addAccountStub)
 
     const httpRequest = {
       body: {
@@ -148,5 +167,27 @@ describe('SignUpController', () => {
     const validate = sut.handle(httpRequest)
     expect(validate.body).toEqual(new InvalidParamError('passwordConfirmation'))
     expect(validate.statusCode).toBe(400)
+  })
+  test('Should return 500 if not send a valid request for create account with spy', () => {
+    const { sut, addAccountStub } = makeSut()
+    const addSpy = jest.spyOn(addAccountStub, 'add')
+
+    const httpRequest = {
+      body: {
+        email: 'teste@gmail.com',
+        name: 'teste',
+        password: 'teste',
+        passwordConfirmation: 'teste'
+      }
+    }
+
+    sut.handle(httpRequest)
+    expect(addSpy).toHaveBeenCalledWith({
+      email: httpRequest.body.email,
+      name: httpRequest.body.name,
+      password: httpRequest.body.password
+    })
+    // expect(validate.body).toEqual(new InternalServerError())
+    // expect(validate.statusCode).toBe(500)
   })
 })
