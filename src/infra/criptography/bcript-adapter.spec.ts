@@ -30,4 +30,16 @@ describe('Encripter Adapter suit tests', () => {
 
     expect(bcryptSpy).toHaveBeenCalledWith('password', 12)
   })
+
+  test('assurance that calls encript it works', async () => {
+    const { sut } = makeSut()
+
+    jest.spyOn(bcript, 'hash').mockImplementationOnce(async (): Promise<string> => {
+      return await 'hashed_password'
+    })
+
+    const validate = await sut.encript('password')
+
+    expect(validate).toEqual('hashed_password')
+  })
 })
