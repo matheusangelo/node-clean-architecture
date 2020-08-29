@@ -1,11 +1,7 @@
-import { AddAccountRepository } from '../../../../data/protocols/add-account-repository'
 import { MongoHelper } from '../helper'
+import { AccountRepository } from './account'
 
-interface SutTypes {
-  accountRepository: AddAccountRepository
-}
-
-const makeSut = (): SutTypes => {
+const makeSut = (): any => {
   return {
     sut: new AccountRepository()
   }
@@ -32,8 +28,8 @@ describe('MongoRepository', () => {
 
     expect(validate).toBeTruthy()
     expect(validate.id).toBeTruthy()
-    expect(validate.name).toBeTruthy(account.name)
-    expect(validate.password).toBeTruthy(account.password)
-    expect(validate.email).toBeTruthy(account.email)
+    expect(validate.name).toBe(account.name)
+    expect(validate.password).toBe(account.password)
+    expect(validate.email).toBe(account.email)
   })
 })
