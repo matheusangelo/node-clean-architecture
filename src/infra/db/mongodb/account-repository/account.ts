@@ -8,13 +8,7 @@ export class AccountRepository implements AddAccountRepository {
     const LAST_REGISTER_INSERTED = 0
     const accountCollection = MongoHelper.getCollection('accounts')
     const results = await accountCollection.insertOne(command)
-    const { name, email, password, _id } = results.ops[LAST_REGISTER_INSERTED]
-
-    return new Promise(resolve => resolve({
-      name: name,
-      email: email,
-      password: password,
-      id: _id
-    }))
+    const account = MongoHelper.map(results.ops[LAST_REGISTER_INSERTED])
+    return new Promise(resolve => resolve(account))
   }
 }
