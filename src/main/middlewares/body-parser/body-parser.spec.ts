@@ -1,5 +1,5 @@
 import request from 'supertest'
-import app from '../config/app'
+import app from '../../config/app'
 
 describe('Name of the group', () => {
   test('should ', async () => {
